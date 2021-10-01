@@ -15,6 +15,7 @@
 		122FB69926FCAD9E00ADFBC4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 122FB69826FCAD9E00ADFBC4 /* Assets.xcassets */; };
 		122FB69C26FCAD9E00ADFBC4 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 122FB69A26FCAD9E00ADFBC4 /* Main.storyboard */; };
 		122FB6A426FCB24300ADFBC4 /* CropTargetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 122FB6A326FCB24300ADFBC4 /* CropTargetView.swift */; };
+		12F03A29270650E100FC0A81 /* DropSplitView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12F03A28270650E100FC0A81 /* DropSplitView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		122FB69B26FCAD9E00ADFBC4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		122FB69D26FCAD9E00ADFBC4 /* Croppy.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Croppy.entitlements; sourceTree = "<group>"; };
 		122FB6A326FCB24300ADFBC4 /* CropTargetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CropTargetView.swift; sourceTree = "<group>"; };
+		12F03A28270650E100FC0A81 /* DropSplitView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DropSplitView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +71,7 @@
 				1223284127062C7700E034FD /* CropPreviewsController.swift */,
 				1223284327062E2B00E034FD /* CroppedImageView.swift */,
 				1223284527063EF900E034FD /* NSCursor+Forbidden.swift */,
+				12F03A28270650E100FC0A81 /* DropSplitView.swift */,
 			);
 			path = Croppy;
 			sourceTree = "<group>";
@@ -145,6 +148,7 @@
 			files = (
 				122FB6A426FCB24300ADFBC4 /* CropTargetView.swift in Sources */,
 				122FB69726FCAD9C00ADFBC4 /* ViewController.swift in Sources */,
+				12F03A29270650E100FC0A81 /* DropSplitView.swift in Sources */,
 				1223284627063EF900E034FD /* NSCursor+Forbidden.swift in Sources */,
 				1223284227062C7700E034FD /* CropPreviewsController.swift in Sources */,
 				1223284427062E2B00E034FD /* CroppedImageView.swift in Sources */,

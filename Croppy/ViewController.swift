@@ -65,18 +65,35 @@ final class ViewController: NSViewController {
     return scrollView
   }()
 
-  lazy var splitView: NSSplitView = {
-    let splitView = NSSplitView()
+  lazy var splitView: DropSplitView = {
+    let splitView = DropSplitView()
     splitView.isVertical = true
     splitView.dividerStyle = .thin
     splitView.addArrangedSubview(self.scrollView)
     splitView.addArrangedSubview(self.cropPreviewsController.view)
     splitView.frame = NSRect(x: 0, y: 0, width: 500, height: 200)
+    splitView.registerForDraggedTypes(self.imageView.registeredDraggedTypes)
     return splitView
   }()
 
+  private func updatePreviews() {
+    self.cropPreviewsController.image = self.imageView.image
+    self.cropPreviewsController.cropTarget = self.cropTargetView.target
+  }
+
   override func loadView() {
     self.view = self.splitView
+
+    self.updatePreviews()
+    self.splitView.onDrop = { [weak self] url in
+      let image = NSImage(byReferencing: url)
+      self?.imageView.image = image
+      self?.cropTargetView.target = CGRect(x: 10, y: 10, width: 100, height: 100)
+      self?.updatePreviews()
+    }
+
+    // Let the split view handle dropped images.
+    self.imageView.unregisterDraggedTypes()
 
     NSLayoutConstraint.activate([
       // This messes up the documentView's frame, why?

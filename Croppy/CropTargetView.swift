@@ -19,7 +19,7 @@ class CropTargetView: NSView {
     }
   }
 
-  private var target: NSRect {
+  var target: NSRect {
     didSet {
       self.needsDisplay = true
     }
@@ -84,7 +84,8 @@ class CropTargetView: NSView {
       self.isPanning = true
       self.onChangeTarget?(self.target)
     } else if self.insideOfCorner {
-      var distance = sqrt(pow(dx, 2) + pow(dy, 2))
+//      var distance = sqrt(pow(dx, 2) + pow(dy, 2))
+      var distance = hypot(dx, dy)
       let x = self.target.minX
       let y = self.target.minY
       let width = self.target.width
