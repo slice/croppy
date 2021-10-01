@@ -7,7 +7,7 @@ final class CropPreviewsController: NSViewController {
 
   var image: NSImage? {
     didSet {
-      for preview in previews {
+      for preview in self.previews {
         preview.image = self.image
       }
     }
@@ -15,7 +15,7 @@ final class CropPreviewsController: NSViewController {
 
   var cropTarget: NSRect? {
     didSet {
-      for preview in previews {
+      for preview in self.previews {
         preview.crop = self.cropTarget
       }
     }

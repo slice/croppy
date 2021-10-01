@@ -8,6 +8,6 @@ enum ForbiddenCursor: String {
 extension NSCursor {
   // FREE THE CURSORS, APPLE.
   static func forbidden(_ selector: ForbiddenCursor) -> NSCursor {
-    return NSCursor.perform(Selector(selector.rawValue), with: nil).takeUnretainedValue() as! NSCursor
+    NSCursor.perform(Selector(selector.rawValue), with: nil).takeUnretainedValue() as! NSCursor
   }
 }

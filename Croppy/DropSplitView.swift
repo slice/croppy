@@ -3,8 +3,8 @@ import Cocoa
 class DropSplitView: NSSplitView {
   var onDrop: ((URL) -> Void)?
 
-  override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
-    return .copy
+  override func draggingEntered(_: NSDraggingInfo) -> NSDragOperation {
+    .copy
   }
 
   override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {

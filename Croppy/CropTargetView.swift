@@ -10,7 +10,7 @@ private enum Corner {
 class CropTargetView: NSView {
   private var size: Double {
     get {
-      return self.target.width
+      self.target.width
     }
 
     set {
@@ -32,7 +32,8 @@ class CropTargetView: NSView {
     super.init(frame: frame)
   }
 
-  required init?(coder: NSCoder) {
+  @available(*, unavailable)
+  required init?(coder _: NSCoder) {
     fatalError("init(coder:) has not been implemented")
   }
 
@@ -93,12 +94,13 @@ class CropTargetView: NSView {
 
       if dx < 0 || dy < 0 { distance = -distance }
       if (self.grabbedCorner == .bottomRight && dy < 0)
-          || (self.grabbedCorner == .topLeft && dx < 0)
-          || self.grabbedCorner == .bottomLeft {
+        || (self.grabbedCorner == .topLeft && dx < 0)
+        || self.grabbedCorner == .bottomLeft
+      {
         distance = -distance
       }
 
-      if distance < 0 && self.size < 50 { return }
+      if distance < 0, self.size < 50 { return }
 
       if event.modifierFlags.contains(.option) {
         self.target = self.target.insetBy(dx: -distance, dy: -distance)
@@ -120,7 +122,7 @@ class CropTargetView: NSView {
     }
   }
 
-  override func mouseUp(with event: NSEvent) {
+  override func mouseUp(with _: NSEvent) {
     if self.isPanning {
       self.isPanning = false
       NSCursor.pop()
@@ -135,20 +137,20 @@ class CropTargetView: NSView {
     corners.append(panCircle.reversed)
     let overCorners = corners.contains(convertedPoint)
 
-    if self.insideOfCorner && !overCorners {
+    if self.insideOfCorner, !overCorners {
       NSCursor.pop()
       self.insideOfCorner = false
     }
 
-    if overPanCircle && !self.insideOfPanCircle {
+    if overPanCircle, !self.insideOfPanCircle {
       NSCursor.openHand.push()
       self.insideOfPanCircle = true
-    } else if self.insideOfPanCircle && !overPanCircle {
+    } else if self.insideOfPanCircle, !overPanCircle {
       NSCursor.pop()
       self.insideOfPanCircle = false
     }
 
-    if overCorners && !self.insideOfCorner {
+    if overCorners, !self.insideOfCorner {
       if convertedPoint.x > self.target.midX {
         self.grabbedCorner = convertedPoint.y > self.target.midY
           ? .topRight
@@ -163,7 +165,7 @@ class CropTargetView: NSView {
       NSCursor.forbidden(nesw ? .resizeNESW : .resizeNWSE).push()
 
       self.insideOfCorner = true
-    } else if self.insideOfCorner && !overCorners {
+    } else if self.insideOfCorner, !overCorners {
       NSCursor.pop()
       self.insideOfCorner = false
     }
@@ -182,7 +184,7 @@ class CropTargetView: NSView {
     self.addTrackingArea(self.entireTrackingArea!)
   }
 
-  override func acceptsFirstMouse(for event: NSEvent?) -> Bool {
-    return true
+  override func acceptsFirstMouse(for _: NSEvent?) -> Bool {
+    true
   }
 }
