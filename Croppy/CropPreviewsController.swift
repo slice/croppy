@@ -45,6 +45,10 @@ final class CropPreviewsController: NSViewController {
 
   override func loadView() {
     self.view = self.stackView
+  }
+
+  override func updateViewConstraints() {
+    super.updateViewConstraints()
 
     NSLayoutConstraint.activate([
       self.circlePreviewView.widthAnchor.constraint(equalToConstant: 100),
