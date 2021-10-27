@@ -62,7 +62,7 @@ final class ViewController: NSViewController {
     return view
   }()
 
-  lazy var clipView: NSClipView = {
+  lazy var clipView: CenteringClipView = {
     let clipView = CenteringClipView()
     clipView.translatesAutoresizingMaskIntoConstraints = false
     clipView.documentView = self.documentView
