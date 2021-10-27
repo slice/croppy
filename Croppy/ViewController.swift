@@ -156,11 +156,6 @@ final class ViewController: NSViewController {
     self.imageView.unregisterDraggedTypes()
 
     NSLayoutConstraint.activate([
-      // This messes up the documentView's frame, why?
-//      self.documentView.topAnchor.constraint(equalTo: self.scrollView.topAnchor),
-//      self.documentView.bottomAnchor.constraint(equalTo: self.scrollView.bottomAnchor),
-//      self.documentView.leadingAnchor.constraint(equalTo: self.scrollView.leadingAnchor),
-//      self.documentView.trailingAnchor.constraint(equalTo: self.scrollView.trailingAnchor),
       self.imageView.topAnchor.constraint(equalTo: self.documentView.topAnchor),
       self.imageView.bottomAnchor.constraint(equalTo: self.documentView.bottomAnchor),
       self.imageView.leadingAnchor.constraint(equalTo: self.documentView.leadingAnchor),
