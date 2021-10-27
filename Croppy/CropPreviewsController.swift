@@ -1,5 +1,28 @@
 import Cocoa
 
+extension NSImage {
+  /// Crops an image, preserving its true colors.
+  func cropping(to rect: NSRect) -> NSImage? {
+    var proposedRect = CGRect(origin: .zero, size: size)
+    guard let imageRef = cgImage(forProposedRect: &proposedRect, context: nil, hints: nil) else {
+      return nil
+    }
+
+    let flippedRect = CGRect(
+      origin: CGPoint(
+        x: rect.minX,
+        y: size.height - (rect.height + rect.minY)
+      ),
+      size: rect.size
+    )
+
+    guard let crop = imageRef.cropping(to: flippedRect) else {
+      return nil
+    }
+    return NSImage(cgImage: crop, size: rect.size)
+  }
+}
+
 final class CropPreviewsController: NSViewController {
   private lazy var previews: [CroppedImageView] = {
     [self.circlePreviewView, self.smallCirclePreviewView, self.squarePreviewView, self.smallSquarePreviewView]
@@ -7,17 +30,31 @@ final class CropPreviewsController: NSViewController {
 
   var image: NSImage? {
     didSet {
-      for preview in self.previews {
-        preview.image = self.image
-      }
+      self.updatePreviews()
     }
   }
 
   var cropTarget: NSRect? {
     didSet {
-      for preview in self.previews {
-        preview.crop = self.cropTarget
-      }
+      self.updatePreviews()
+    }
+  }
+
+  private func updatePreviews() {
+    guard let image = self.image, let crop = self.cropTarget else { return }
+
+    let croppedImage = image.cropping(to: crop)
+
+    let thumbnailImage = NSImage(size: NSSize(width: 100, height: 100), flipped: false) { rect in
+      NSColor.red.setFill()
+      rect.fill()
+      image.draw(in: rect, from: crop, operation: .copy, fraction: 1.0)
+      return true
+    }
+
+    for preview in self.previews {
+      preview.thumbnailImage = thumbnailImage
+      preview.image = croppedImage
     }
   }
 
