@@ -22,17 +22,32 @@ final class CenteringClipView: NSClipView {
   }
 }
 
+final class SizableImageView: NSImageView {
+  var overriddenContentSize: NSSize?
+
+  override var intrinsicContentSize: NSSize {
+    if let overriddenContentSize = self.overriddenContentSize {
+      return overriddenContentSize
+    } else {
+      return super.intrinsicContentSize
+    }
+  }
+}
+
 final class ViewController: NSViewController {
   private var cropPreviewsController = CropPreviewsController()
 
-  lazy var imageView: NSImageView = {
+  lazy var imageView: SizableImageView = {
     let image = NSImage(named: "proudscrooge")!
-    let imageView = NSImageView(image: image)
+    let imageView = SizableImageView(image: image)
     imageView.translatesAutoresizingMaskIntoConstraints = false
     imageView.imageScaling = .scaleProportionallyUpOrDown
     imageView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
     return imageView
   }()
+
+  private var image: NSImage?
+  private var liveResizeImage: NSImage?
 
   lazy var cropTargetView: CropTargetView = {
     let view = CropTargetView()
@@ -54,6 +69,9 @@ final class ViewController: NSViewController {
     return clipView
   }()
 
+  private var willStartLiveMagnifyObserver: NSObjectProtocol?
+  private var didEndLiveMagnifyObserver: NSObjectProtocol?
+
   lazy var scrollView: NSScrollView = {
     let scrollView = NSScrollView()
     scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -61,7 +79,13 @@ final class ViewController: NSViewController {
     scrollView.minMagnification = 0.1
     scrollView.maxMagnification = 10
     scrollView.contentView = self.clipView
-    scrollView.setFrameSize(NSSize(width: 250, height: 200))
+    scrollView.postsFrameChangedNotifications = true
+    self.willStartLiveMagnifyObserver = NotificationCenter.default.addObserver(forName: NSScrollView.willStartLiveMagnifyNotification, object: scrollView, queue: nil) { _ in
+      self.imageView.image = self.liveResizeImage
+    }
+    self.didEndLiveMagnifyObserver = NotificationCenter.default.addObserver(forName: NSScrollView.didEndLiveMagnifyNotification, object: scrollView, queue: nil) { _ in
+      self.imageView.image = self.image
+    }
     return scrollView
   }()
 
@@ -76,20 +100,46 @@ final class ViewController: NSViewController {
     return splitView
   }()
 
-  private func updatePreviews() {
-    self.cropPreviewsController.image = self.imageView.image
+  private func updateImages(image: NSImage) {
+    NSLog("*** image size: \(image.size)")
+    self.image = image
+    self.liveResizeImage = self.makeLiveResizeImage(from: image)
+    NSLog("    live resize image size: \(self.liveResizeImage!.size)")
+    self.imageView.overriddenContentSize = image.size
+    self.imageView.image = image
+    self.cropPreviewsController.image = image
     self.cropPreviewsController.cropTarget = self.cropTargetView.target
+  }
+
+  private func makeLiveResizeImage(from original: NSImage) -> NSImage {
+    let actualSize = original.size
+    let largestDimension = max(actualSize.width, actualSize.height)
+    let downscaleFactor = max(1.0, floor(largestDimension / 500.0))
+    let lowQualitySize = NSSize(width: actualSize.width / downscaleFactor, height: actualSize.height / downscaleFactor)
+    NSLog("    downscale factor: \(downscaleFactor)")
+
+    let lowQualityImage = NSImage(size: lowQualitySize)
+    lowQualityImage.lockFocus()
+    NSGraphicsContext.current!.imageInterpolation = .medium
+    original.draw(
+      in: NSRect(origin: .zero, size: lowQualitySize),
+      from: NSRect(origin: .zero, size: actualSize),
+      operation: .copy,
+      fraction: 1.0
+    )
+    lowQualityImage.unlockFocus()
+
+    return lowQualityImage
   }
 
   override func loadView() {
     self.view = self.splitView
 
-    self.updatePreviews()
+    self.updateImages(image: self.imageView.image!)
     self.splitView.onDrop = { [weak self] url in
       let image = NSImage(byReferencing: url)
-      self?.imageView.image = image
       self?.cropTargetView.target = CGRect(x: 10, y: 10, width: 100, height: 100)
-      self?.updatePreviews()
+      self?.updateImages(image: image)
     }
 
     // Let the split view handle dropped images.
@@ -116,6 +166,15 @@ final class ViewController: NSViewController {
     self.cropPreviewsController.image = self.imageView.image
     self.cropTargetView.onChangeTarget = { [weak self] target in
       self?.cropPreviewsController.cropTarget = target
+    }
+  }
+
+  deinit {
+    if let willStartLiveMagnifyObserver = self.willStartLiveMagnifyObserver {
+      NotificationCenter.default.removeObserver(willStartLiveMagnifyObserver)
+    }
+    if let didEndLiveMagnifyObserver = self.didEndLiveMagnifyObserver {
+      NotificationCenter.default.removeObserver(didEndLiveMagnifyObserver)
     }
   }
 }
