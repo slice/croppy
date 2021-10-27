@@ -80,10 +80,18 @@ final class ViewController: NSViewController {
     scrollView.maxMagnification = 10
     scrollView.contentView = self.clipView
     scrollView.postsFrameChangedNotifications = true
-    self.willStartLiveMagnifyObserver = NotificationCenter.default.addObserver(forName: NSScrollView.willStartLiveMagnifyNotification, object: scrollView, queue: nil) { _ in
+    self.willStartLiveMagnifyObserver = NotificationCenter.default.addObserver(
+      forName: NSScrollView.willStartLiveMagnifyNotification,
+      object: scrollView,
+      queue: nil
+    ) { _ in
       self.imageView.image = self.liveResizeImage
     }
-    self.didEndLiveMagnifyObserver = NotificationCenter.default.addObserver(forName: NSScrollView.didEndLiveMagnifyNotification, object: scrollView, queue: nil) { _ in
+    self.didEndLiveMagnifyObserver = NotificationCenter.default.addObserver(
+      forName: NSScrollView.didEndLiveMagnifyNotification,
+      object: scrollView,
+      queue: nil
+    ) { _ in
       self.imageView.image = self.image
     }
     return scrollView
