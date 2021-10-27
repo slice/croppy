@@ -147,6 +147,7 @@ final class ViewController: NSViewController {
     self.splitView.onDrop = { [weak self] url in
       self?.view.window?.representedURL = url
       let image = NSImage(byReferencing: url)
+      self?.view.window?.title = "Croppy (\(Int(image.size.width)) × \(Int(image.size.height)))"
       self?.cropTargetView.target = CGRect(x: 10, y: 10, width: 100, height: 100)
       self?.updateImages(image: image)
     }
