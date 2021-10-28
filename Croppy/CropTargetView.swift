@@ -38,17 +38,13 @@ class CropTargetView: NSView {
   }
 
   override func draw(_ dirtyRect: NSRect) {
-    // If we're in a scroll view, factor in the magnification to prevent the
-    // crop target from changing visual thickness.
-    let magnification = self.magnification()
-
     let shadow = NSBezierPath(rect: dirtyRect)
     shadow.append(NSBezierPath(ovalIn: self.target).reversed)
     NSColor.black.withAlphaComponent(0.5).setFill()
     shadow.fill()
 
     let path = NSBezierPath(rect: self.target)
-    path.lineWidth = CGFloat(3.0 / magnification)
+    path.lineWidth = self.scaleMetricAccordingToMagnification(3.0)
     NSColor.systemRed.setStroke()
     path.stroke()
 
@@ -59,13 +55,13 @@ class CropTargetView: NSView {
     let verticalAlign = NSBezierPath()
     verticalAlign.move(to: NSPoint(x: self.target.midX, y: self.target.minY))
     verticalAlign.line(to: NSPoint(x: self.target.midX, y: self.target.maxY))
-    verticalAlign.lineWidth = CGFloat(1 / magnification)
+    verticalAlign.lineWidth = self.scaleMetricAccordingToMagnification(1.0)
     verticalAlign.stroke()
 
     let horizontalAlign = NSBezierPath()
     horizontalAlign.move(to: NSPoint(x: self.target.minX, y: self.target.midY))
     horizontalAlign.line(to: NSPoint(x: self.target.maxX, y: self.target.midY))
-    horizontalAlign.lineWidth = CGFloat(1 / magnification)
+    horizontalAlign.lineWidth = self.scaleMetricAccordingToMagnification(1.0)
     horizontalAlign.stroke()
   }
 
