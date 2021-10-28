@@ -64,6 +64,7 @@
 		122FB69326FCAD9C00ADFBC4 /* Croppy */ = {
 			isa = PBXGroup;
 			children = (
+				12DCB3CE272AA89800961155 /* Extensions */,
 				122FB69426FCAD9C00ADFBC4 /* AppDelegate.swift */,
 				122FB69626FCAD9C00ADFBC4 /* ViewController.swift */,
 				122FB69826FCAD9E00ADFBC4 /* Assets.xcassets */,
@@ -72,11 +73,18 @@
 				122FB6A326FCB24300ADFBC4 /* CropTargetView.swift */,
 				1223284127062C7700E034FD /* CropPreviewsController.swift */,
 				1223284327062E2B00E034FD /* CroppedImageView.swift */,
-				1223284527063EF900E034FD /* NSCursor+Forbidden.swift */,
 				12F03A28270650E100FC0A81 /* DropSplitView.swift */,
-				12DCB3CC272AA2DD00961155 /* NSView+Magnification.swift */,
 			);
 			path = Croppy;
+			sourceTree = "<group>";
+		};
+		12DCB3CE272AA89800961155 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				1223284527063EF900E034FD /* NSCursor+Forbidden.swift */,
+				12DCB3CC272AA2DD00961155 /* NSView+Magnification.swift */,
+			);
+			path = Extensions;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
