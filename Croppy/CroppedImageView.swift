@@ -20,7 +20,7 @@ class CroppedImageView: NSView, NSDraggingSource {
     }
   }
 
-  override func draw(_ dirtyRect: NSRect) {
+  override func draw(_: NSRect) {
     guard let thumbnailImage = self.thumbnailImage else { return }
     if self.rounded {
       NSBezierPath(ovalIn: bounds).reversed.setClip()
