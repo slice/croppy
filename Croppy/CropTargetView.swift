@@ -37,14 +37,29 @@ class CropTargetView: NSView {
     fatalError("init(coder:) has not been implemented")
   }
 
+  /// Determine the magnification level of a scroll view that we're inside of.
+  ///
+  /// This is so that we can adjust drawing to appear consistent regardless of
+  /// zoom level by counteracting the magnification.
+  private func magnification() -> Float {
+    // Three superviews up: the document view, clip view, and then finally the
+    // scroll view.
+    let scrollView = self.superview?.superview?.superview as? NSScrollView
+    return Float(scrollView?.magnification ?? 1.0)
+  }
+
   override func draw(_ dirtyRect: NSRect) {
+    // If we're in a scroll view, factor in the magnification to prevent the
+    // crop target from changing visual thickness.
+    let magnification = self.magnification()
+
     let shadow = NSBezierPath(rect: dirtyRect)
     shadow.append(NSBezierPath(ovalIn: self.target).reversed)
     NSColor.black.withAlphaComponent(0.5).setFill()
     shadow.fill()
 
     let path = NSBezierPath(rect: self.target)
-    path.lineWidth = 3
+    path.lineWidth = CGFloat(3.0 / magnification)
     NSColor.systemRed.setStroke()
     path.stroke()
 
@@ -55,13 +70,13 @@ class CropTargetView: NSView {
     let verticalAlign = NSBezierPath()
     verticalAlign.move(to: NSPoint(x: self.target.midX, y: self.target.minY))
     verticalAlign.line(to: NSPoint(x: self.target.midX, y: self.target.maxY))
-    verticalAlign.lineWidth = 1
+    verticalAlign.lineWidth = CGFloat(1 / magnification)
     verticalAlign.stroke()
 
     let horizontalAlign = NSBezierPath()
     horizontalAlign.move(to: NSPoint(x: self.target.minX, y: self.target.midY))
     horizontalAlign.line(to: NSPoint(x: self.target.maxX, y: self.target.midY))
-    horizontalAlign.lineWidth = 1
+    horizontalAlign.lineWidth = CGFloat(1 / magnification)
     horizontalAlign.stroke()
   }
 
