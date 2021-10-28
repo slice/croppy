@@ -37,17 +37,6 @@ class CropTargetView: NSView {
     fatalError("init(coder:) has not been implemented")
   }
 
-  /// Determine the magnification level of a scroll view that we're inside of.
-  ///
-  /// This is so that we can adjust drawing to appear consistent regardless of
-  /// zoom level by counteracting the magnification.
-  private func magnification() -> Float {
-    // Three superviews up: the document view, clip view, and then finally the
-    // scroll view.
-    let scrollView = self.superview?.superview?.superview as? NSScrollView
-    return Float(scrollView?.magnification ?? 1.0)
-  }
-
   override func draw(_ dirtyRect: NSRect) {
     // If we're in a scroll view, factor in the magnification to prevent the
     // crop target from changing visual thickness.
@@ -87,20 +76,21 @@ class CropTargetView: NSView {
   private var isResizing = false
 
   override func mouseDragged(with event: NSEvent) {
-    let magnification = (self.superview?.superview?.superview as? NSScrollView?)??.magnification ?? CGFloat(1)
+    // If we're in a scroll view, dampen (or strengthen) the position delta
+    // according to the magnification.
+    let magnification = self.magnification()
     let dx = event.deltaX / magnification
     let dy = -event.deltaY / magnification
 
+    var pendingTarget: NSRect?
+
     if self.insideOfPanCircle {
-      let newTarget = self.target.offsetBy(dx: dx, dy: dy)
-      self.target = newTarget
+      pendingTarget = self.target.offsetBy(dx: dx, dy: dy)
       if !self.isPanning {
         NSCursor.closedHand.push()
       }
       self.isPanning = true
-      self.onChangeTarget?(self.target)
     } else if self.insideOfCorner {
-//      var distance = sqrt(pow(dx, 2) + pow(dy, 2))
       var distance = hypot(dx, dy)
       let x = self.target.minX
       let y = self.target.minY
@@ -118,23 +108,36 @@ class CropTargetView: NSView {
       if distance < 0, self.size < 50 { return }
 
       if event.modifierFlags.contains(.option) {
-        self.target = self.target.insetBy(dx: -distance, dy: -distance)
+        pendingTarget = self.target.insetBy(dx: -distance, dy: -distance)
       } else {
+        var newX = x
+        var newY = y
+
+        // Offset the position so that the entire frame doesn't change position
+        // as we resize from a corner.
         switch self.grabbedCorner! {
         case .topLeft:
-          self.target = NSRect(x: x - distance, y: y, width: width + distance, height: height + distance)
-        case .topRight:
-          self.target = NSRect(x: x, y: y, width: width + distance, height: height + distance)
+          newX -= distance
         case .bottomLeft:
-          self.target = NSRect(x: x - distance, y: y - distance, width: width + distance, height: height + distance)
+          newX -= distance
+          newY -= distance
         case .bottomRight:
-          self.target = NSRect(x: x, y: y - distance, width: width + distance, height: height + distance)
+          newY -= distance
+        default: break
         }
+
+        pendingTarget = NSRect(x: newX, y: newY, width: width + distance, height: height + distance)
       }
 
       self.isResizing = true
-      self.onChangeTarget?(self.target)
     }
+
+    guard let pendingTarget = pendingTarget else {
+      return
+    }
+
+    self.target = pendingTarget
+    self.onChangeTarget?(pendingTarget)
   }
 
   override func mouseUp(with _: NSEvent) {
