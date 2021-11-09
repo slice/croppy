@@ -45,12 +45,13 @@ final class CropPreviewsController: NSViewController {
 
     let croppedImage = image.cropping(to: crop)
 
-    let thumbnailImage = NSImage(size: NSSize(width: 100, height: 100), flipped: false) { rect in
-      NSColor.red.setFill()
-      rect.fill()
-      image.draw(in: rect, from: crop, operation: .copy, fraction: 1.0)
-      return true
-    }
+    let thumbnailRect = NSRect(origin: .zero, size: CGSize(width: 100.0, height: 100.0))
+    let thumbnailImage = NSImage(size: thumbnailRect.size)
+    thumbnailImage.lockFocus()
+    NSColor.red.setFill()
+    thumbnailRect.fill()
+    image.draw(in: thumbnailRect, from: crop, operation: .copy, fraction: 1.0)
+    thumbnailImage.unlockFocus()
 
     for preview in self.previews {
       preview.thumbnailImage = thumbnailImage
